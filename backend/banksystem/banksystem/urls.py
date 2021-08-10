@@ -16,9 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
-from api import urls as api_urls
+from loans import urls as loansUrls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include(api_urls))
+    path('', include(loansUrls)),
+    path('api/v1/dj-rest-auth/', include('dj_rest_auth.urls')),
+    path('api/v1/dj-rest-auth/registration/',
+         include('dj_rest_auth.registration.urls')),
 ]
