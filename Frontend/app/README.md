@@ -1,4 +1,4 @@
-# bank
+# app
 
 ## Project setup
 ```
