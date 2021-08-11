@@ -1,19 +1,13 @@
-from .models import User, Loan
+from .models import Loan
 from rest_framework import viewsets
-from .serializers import UserSerializer, LoanSerializer
+from .serializers import LoanSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.core import serializers
 from .permissions import IsBankerOrAdmin
-from rest_framework.permissions import IsAdminUser
 from rest_framework.exceptions import PermissionDenied
-import json
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAdminUser,)
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+from users.models import User
+from .helpers import toJSON
 
 # Create your views here.
 
@@ -24,9 +18,11 @@ class LoanViewSet(viewsets.ModelViewSet):
     serializer_class = LoanSerializer
 
     def create(self, request):
-        print("creating")
-        body_unicode = request.body.decode('utf-8')
-        body = json.loads(body_unicode)
+        body = toJSON(request.body)
+
+        if not request.user.is_superuser:
+            if request.user.id != body['customer'] or request.user.user_type != User.CUSTOMER:
+                raise PermissionDenied
 
         customer = User.objects.get(pk=body['customer'])
         amount = body['amount']

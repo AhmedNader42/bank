@@ -16,11 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
-from loans import urls as loansUrls
+from loans import urls as loans_urls
+from users import urls as users_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include(loansUrls)),
+    path('', include(users_urls)),
+    path('', include(loans_urls)),
     path('api/v1/dj-rest-auth/', include('dj_rest_auth.urls')),
     path('api/v1/dj-rest-auth/registration/',
          include('dj_rest_auth.registration.urls')),

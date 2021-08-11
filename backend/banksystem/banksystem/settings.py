@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'dj_rest_auth.registration',
 
+    'users',
     'loans'
 ]
 
@@ -141,4 +142,4 @@ STATIC_URL = '/static/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 SITE_ID = 1
-AUTH_USER_MODEL = 'loans.User'
+AUTH_USER_MODEL = 'users.User'
