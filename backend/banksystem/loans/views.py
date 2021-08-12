@@ -45,15 +45,25 @@ class LoanViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
+    
+
 
 @api_view(['GET'])
 def view_customer_loans(request, id):
 
-    if request.user.id != id and not request.user.is_superuser:
+    if request.user.id != id:
         raise PermissionDenied()
 
     queryset = Loan.objects.all().filter(customer=id)
-    for l in queryset:
-        print(l.customer)
+    serializer = LoanSerializer(queryset, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def view_pending_loans(request):
+    if request.user.user_type != User.BANKER:
+        raise PermissionDenied()
+
+    queryset = Loan.objects.all().filter(status=Loan.PENDING)
     serializer = LoanSerializer(queryset, many=True)
     return Response(serializer.data)
