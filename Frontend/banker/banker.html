@@ -14,35 +14,49 @@
     <div class="topnav" id="myTopnav">
         <a href="" onclick="logout()">Logout</a>
     </div>
-    <button class="button" id="createLoanBtn">Create Loan</button>
-    <table id="loansTable"></table>
+    <button class="button" id="createOptionBtn">Create Options</button>
 
-    <form>
-        <fieldset>
-            <legend>Outputs</legend>
-            <div id="amortizationTable" style="width: 100%;"></div>
-        </fieldset>
-    </form>
-    <div id="createLoanForm" class="modal">
-
+    <fieldset class="table-container">
+        <legend>Pending Loans</legend>
+        <table id="loansTable" class="listTable">
+        </table>
+    </fieldset>
+    <div id="createOptionForm" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <select id="loanOptions" class="select-css" onchange="selectedLoanOption()">
-            </select>
-            <span> Months</span>
-            <input type="range" min="1" max="100" value="50" id="rangeSlider">
-            <input id="amount" type="number" id="intervalPicker" name="quantity" min="1" max="100" value="50">
+            <div>
+                <input id="months" type="number" id="intervalPicker" name="quantity" min="1" max="50" value="6">
+                <span> Months</span>
+            </div>
+            <div>
+                <p> Minimum Amount </p>
+                <input type="range" min="1" max="10000000" value="50" id="minRangeSlider">
+                <input id="minAmount" type="number" id="intervalPicker" name="quantity" min="2" max="10000000"
+                    value="10000">
+            </div>
+            <div>
+                <p> Maximum Amount </p>
+                <input type="range" min="1" max="10000000" value="50" id="maxRangeSlider">
+                <input id="maxAmount" type="number" id="intervalPicker" name="quantity" min="2" max="10000000"
+                    value="10000">
+            </div>
 
+            <div>
+                <span>Interest </span>
+                <input id="interest" type="number" id="intervalPicker" name="quantity" min="0" max="99" value="1">
+            </div>
 
-            <p id="interest">Interest </p>
-            <p id="minAmount"> Minimum Amount </p>
-            <p id="maxAmount"> Maximum Amount </p>
-
-            <button class="button" id="createLoanRequestButton">Create</button>
+            <button class="button" id="createLoanOptionRequestButton">Create Loan</button>
+            <button class="button" id="createFundOptionRequestButton">Create Fund</button>
         </div>
-
-        
     </div>
+
+    <fieldset class="table-container">
+        <legend>Pending Funds</legend>
+        <table id="fundsTable" class="listTable">
+        </table>
+    </fieldset>
+
     <script src="index.js"></script>
 </body>
 

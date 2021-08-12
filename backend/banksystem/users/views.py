@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser
-from .serializers import UserSerializer
+from .serializers import CustomUserDetailsSerializer as UserSerializer
 from .models import User
 from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
@@ -9,6 +9,7 @@ from rest_framework.response import Response
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    # permission_classes = (IsAdminUser, )
     queryset = User.objects.all()
     serializer_class = UserSerializer
 

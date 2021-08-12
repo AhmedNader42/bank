@@ -38,7 +38,7 @@ function loadProfile(token, username) {
             console.log(res);
             const userData = res.data;
             let user = {
-                id: userData["id"],
+                pk: userData["pk"],
                 username: userData["username"],
                 email: userData["email"],
                 user_type: userData["user_type"],
@@ -50,6 +50,9 @@ function loadProfile(token, username) {
                     break;
                 case 2:
                     window.location.href = "customer/customer.html";
+                    break;
+                case 3:
+                    window.location.href = "funder/funder.html";
                     break;
                 default:
                     break;

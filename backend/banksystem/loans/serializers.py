@@ -5,7 +5,7 @@ from .models import Loan, LoanOption
 class LoanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Loan
-        fields = ('id', 'customer', 'loan_type', 'amount', 'started', 'status')
+        fields = ('id', 'customer', 'option', 'amount', 'started', 'status')
 
 class LoanOptionSerializer(serializers.ModelSerializer):
     class Meta:

@@ -8,7 +8,9 @@ from .permissions import IsBankerOrReadOnly
 from rest_framework.exceptions import PermissionDenied
 from users.models import User
 from .helpers import toJSON
-
+from bank.models import Bank
+from bank.views import create_bank
+from django.shortcuts import get_object_or_404
 # Create your views here.
 
 
@@ -24,28 +26,59 @@ class LoanViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         body = toJSON(request.body)
+        print(body)
 
         if request.user.id != body['customer'] or request.user.user_type != User.CUSTOMER:
-            print(request.user.id != body['customer'])
-            print(request.user.user_type != User.CUSTOMER)
-            raise PermissionDenied
+            raise PermissionDenied()
 
         customer = User.objects.get(pk=body['customer'])
         amount = body['amount']
-        loan_type = LoanOption.objects.get(pk=body['loan_type'])
+        option = LoanOption.objects.get(pk=body['option'])
 
-        
-        if amount > loan_type.maximum_amount or amount < loan_type.minimum_amount:
+        if amount > option.maximum_amount or amount < option.minimum_amount:
             return Response({"message": "Incorrect amount for your plan"})
 
-        l = Loan(customer=customer, loan_type=loan_type,
+        l = Loan(customer=customer, option=option,
                  amount=amount, status=Loan.PENDING)
         l.save()
         serializer = LoanSerializer(l)
 
         return Response(serializer.data)
 
-    
+    def partial_update(self, request, pk=None):
+        if request.user.user_type != User.BANKER:
+            raise PermissionDenied()
+        body = toJSON(request.body)
+        status = body["status"]
+
+        loan = get_object_or_404(Loan, pk=pk)
+
+        bankList = Bank.objects.all().filter(pk=0)
+        bank = None
+        if len(bankList) == 0:
+            create_bank()
+            bankList = Bank.objects.all().filter(pk=0)
+            bank = bankList[0]
+        else:
+            bank = bankList[0]
+
+        if status != Loan.APPROVED:
+            loan.status = status 
+            loan.save()
+            serializer = LoanSerializer(loan)
+            return Response(serializer.data)
+
+        if loan.amount < bank.total_amount:
+            print("Can take loan")
+            loan.status = status
+            loan.save()
+            bank.total_amount -= loan.amount
+            bank.save()
+            serializer = LoanSerializer(loan)
+            return Response(serializer.data)
+        else:
+            print("Can't take loan")
+            return Response({"message": "Not enough funds"})
 
 
 @api_view(['GET'])

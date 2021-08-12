@@ -8,10 +8,9 @@ class User(AbstractUser):
     CUSTOMER = 2
     FUNDER = 3
     USER_TYPE_CHOICES = (
-        (BANKER, 'banker'),
-        (CUSTOMER, 'customer'),
-        (FUNDER, 'funder')
+        (BANKER, "Banker"),
+        (CUSTOMER, "CUSTOMER"),
+        (FUNDER, "FUNDER"),
     )
 
-    user_type = models.PositiveSmallIntegerField(
-        choices=USER_TYPE_CHOICES, default=2)
+    user_type = models.PositiveSmallIntegerField()

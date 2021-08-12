@@ -27,26 +27,27 @@ body {
     color: white;
 }
 
-.listTable {
+#fundsTable {
     font-family: Arial, Helvetica, sans-serif;
     border-collapse: collapse;
     width: 100%;
 }
 
-.listTable td, th {
+#fundsTable td,
+#customers th {
     border: 1px solid #ddd;
     padding: 8px;
 }
 
-.listTable tr:nth-child(even) {
+#fundsTable tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
-.listTable tr:hover {
+#fundsTable tr:hover {
     background-color: #ddd;
 }
 
-.listTable th {
+#fundsTable th {
     padding-top: 12px;
     padding-bottom: 12px;
     text-align: left;
@@ -74,34 +75,6 @@ body {
 .button:hover {
     background-color: #008cba;
     color: white;
-}
-
-.button-reject {
-    border: none;
-    color: white;
-    padding: 16px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    transition-duration: 0.4s;
-    cursor: pointer;
-    background-color: white;
-    color: black;
-    border: 2px solid #ba003e;
-    border-radius: 10px;
-}
-
-.button-reject:hover {
-    background-color: #ba003e;
-    color: white;
-}
-
-.table-container {
-    height: 350px;
-    overflow-y: scroll;
-    border-radius: 10px;
 }
 
 .modal {

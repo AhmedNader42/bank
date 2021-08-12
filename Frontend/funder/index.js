@@ -1,72 +1,72 @@
 "use strict";
 loadToken();
-loadLoanOptions();
+loadFundOptions();
 
-let availableLoanOptions = [];
-let availableUserLoans = [];
+let availableFundOptions = [];
+let availableUserFunds = [];
 
-function loadUserLoans() {
+function loadUserFunds() {
     const user = JSON.parse(localStorage.getItem("user"));
     const token = loadToken()["token"];
 
     console.log(user["pk"])
-    const customerLoans = {
+    const funderFunds = {
         method: "get",
-        url: `http://localhost:8000/customer/${user["pk"]}/`,
+        url: `http://localhost:8000/funder/${user["pk"]}/`,
         headers: {
             Authorization: `Token ${token}`,
         },
     };
 
-    axios(customerLoans)
+    axios(funderFunds)
         .then((res) => {
             console.log(res);
-            availableUserLoans = res.data;
-            for (let i = 0; i < availableUserLoans.length; i++) {
-                availableUserLoans[i]["option"] = getPlanWithID(availableUserLoans[i]["option"]);
+            availableUserFunds = res.data;
+            for (let i = 0; i < availableUserFunds.length; i++) {
+                availableUserFunds[i]["option"] = getPlanWithID(availableUserFunds[i]["option"]);
             }
-            listLoans(res.data);
+            listFunds(res.data);
         })
         .catch((e) => {
-            alert("Error loading loans!");
+            alert("Error loading funds!");
         });
 }
 
-function loadLoanOptions() {
+function loadFundOptions() {
     let tokenData = loadToken();
     let token = tokenData["token"];
 
-    const loanOptions = {
+    const fundOptions = {
         method: "get",
-        url: `http://localhost:8000/loan-options/`,
+        url: `http://localhost:8000/fund-options/`,
         headers: {
             Authorization: `Token ${token}`,
         },
     };
 
-    axios(loanOptions)
+    axios(fundOptions)
         .then((res) => {
             console.log(res);
 
             // Grab the data.
-            let loanOptions = res.data;
+            let fundOptions = res.data;
 
             // Sort the list descending.
-            loanOptions = loanOptions.sort(function (a, b) {
+            fundOptions = fundOptions.sort(function (a, b) {
                 return b["duration"] - a["duration"];
             });
 
-            // Keep the loan options to use when changing plans.
-            availableLoanOptions = loanOptions;
+            // Keep the fund options to use when changing plans.
+            availableFundOptions = fundOptions;
 
             // Grab the select element.
-            var select = document.getElementById("loanOptions");
+            var select = document.getElementById("fundOptions");
 
             // Empty any previous data.
             select.innerHTML = "";
 
-            // Add loan options as select options.
-            loanOptions.forEach((element) => {
+            // Add fund options as select options.
+            fundOptions.forEach((element) => {
                 var option = document.createElement("option");
                 let duration = element["duration"];
                 option.value = element["id"];
@@ -75,55 +75,56 @@ function loadLoanOptions() {
             });
 
             // Update the rest of the elements to show the selected default
-            selectedLoanOption();
+            selectedFundOption();
 
-            // Load the user loans
-            loadUserLoans();
+            // Load the user funds
+            loadUserFunds();
         })
         .catch((e) => {
-            alert("LoanOptions Error!");
+            alert("FundOptions Error!");
         });
 }
 
-function createLoanRequest() {
-    let select = document.getElementById("loanOptions");
+function createFundRequest() {
+    let select = document.getElementById("fundOptions");
     let selectedPlan = getPlanWithID(select.value);
     let amount = document.getElementById("amount");
     const user = JSON.parse(localStorage.getItem("user"));
     let token = loadToken()["token"];
-
-    const createLoan = {
+    
+    console.log(user)
+    const createFund = {
         method: "post",
-        url: `http://localhost:8000/loans/`,
+        url: `http://localhost:8000/funds/`,
         headers: {
             Authorization: `Token ${token}`,
         },
         data: {
-            customer: user.pk,
+            funder: user.pk,
             amount: Number(amount.value),
             option: selectedPlan["id"],
         },
     };
 
-    axios(createLoan)
+    axios(createFund)
         .then((res) => {
             console.log(res);
             if (res.data.message) {
                 alert(res.data.message);
             }
-            loadUserLoans();
+            loadUserFunds();
         })
         .catch((e) => {
             console.log(e);
-            alert("Creating loan Error!");
+            alert("Creating fund Error!");
         });
 }
 
-function listLoans() {
-    let table = document.getElementById("loansTable");
+function listFunds() {
+    let table = document.getElementById("fundsTable");
     let thead = table.createTHead();
     let tbody = table.createTBody();
-    const LOAN_STATUS = {
+    const FUND_STATUS = {
         1: {
             state: "PENDING",
             color: "gray",
@@ -145,20 +146,20 @@ function listLoans() {
     th.insertCell().innerHTML = "Started";
     th.insertCell().innerHTML = "Status";
 
-    for (let i = 0; i < availableUserLoans.length; i++) {
-        const loan = availableUserLoans[i];
+    for (let i = 0; i < availableUserFunds.length; i++) {
+        const fund = availableUserFunds[i];
         let row = tbody.insertRow();
 
         row.setAttribute("onclick", "showAmortizationTableForCell(" + i + ");");
 
-        row.insertCell().innerHTML = loan["amount"];
-        row.insertCell().innerHTML = loan["option"]["duration"] + " Months";
-        row.insertCell().innerHTML = loan["started"].split("T")[0];
+        row.insertCell().innerHTML = fund["amount"];
+        row.insertCell().innerHTML = fund["option"]["duration"] + " Months";
+        row.insertCell().innerHTML = fund["started"].split("T")[0];
 
         let statusCell = row.insertCell();
-        let loanStatus = LOAN_STATUS[loan["status"]];
-        statusCell.innerHTML = loanStatus["state"];
-        statusCell.style.backgroundColor = loanStatus["color"];
+        let fundStatus = FUND_STATUS[fund["status"]];
+        statusCell.innerHTML = fundStatus["state"];
+        statusCell.style.backgroundColor = fundStatus["color"];
     }
 
     table.appendChild(thead);
@@ -185,8 +186,8 @@ function loadToken() {
     }
 }
 
-function selectedLoanOption() {
-    let select = document.getElementById("loanOptions");
+function selectedFundOption() {
+    let select = document.getElementById("fundOptions");
     let interest = document.getElementById("interest");
     let minAmount = document.getElementById("minAmount");
     let maxAmount = document.getElementById("maxAmount");
@@ -212,20 +213,20 @@ function selectedLoanOption() {
 }
 
 function getPlanWithID(id) {
-    for (let i = 0; i < availableLoanOptions.length; i++) {
-        let loanOption = availableLoanOptions[i];
-        if (loanOption["id"] == id) {
-            return loanOption;
+    for (let i = 0; i < availableFundOptions.length; i++) {
+        let fundOption = availableFundOptions[i];
+        if (fundOption["id"] == id) {
+            return fundOption;
         }
     }
 }
-var btn = document.getElementById("createLoanRequestBtn");
-createLoanRequestButton.onclick = function () {
-    createLoanRequest();
+var btn = document.getElementById("createFundRequestBtn");
+createFundRequestButton.onclick = function () {
+    createFundRequest();
 };
 
-var modal = document.getElementById("createLoanForm");
-var btn = document.getElementById("createLoanBtn");
+var modal = document.getElementById("createFundForm");
+var btn = document.getElementById("createFundBtn");
 var span = document.getElementsByClassName("close")[0];
 btn.onclick = function () {
     modal.style.display = "block";
@@ -247,15 +248,15 @@ slider.oninput = function () {
 };
 
 function showAmortizationTableForCell(rowIndex) {
-    let loan = availableUserLoans[rowIndex];
-    let loanOptions = loan["option"];
+    let fund = availableUserFunds[rowIndex];
+    let fundOptions = fund["option"];
     let amortizationTable = document.getElementById("amortizationTable");
-    console.log(loan);
+    console.log(fund);
     amortizationTable.innerHTML = "";
     amortizationTable.innerHTML = amort(
-        Number(loan["amount"]),
-        loanOptions["interest_rate"] / 100,
-        loanOptions["duration"]
+        Number(fund["amount"]),
+        fundOptions["interest_rate"] / 100,
+        fundOptions["duration"]
     );
 }
 function amort(balance, interestRate, terms) {
@@ -267,7 +268,7 @@ function amort(balance, interestRate, terms) {
 
     //begin building the return string for the display of the amort table
     var result =
-        "Loan amount: $" +
+        "Fund amount: $" +
         balance.toFixed(2) +
         "<br />" +
         "Interest rate: " +
@@ -288,7 +289,7 @@ function amort(balance, interestRate, terms) {
         "<table border='1' width='100%'><tr><th>Month #</th><th>Balance</th>" + "<th>Interest</th><th>Principal</th>";
 
     /**
-     * Loop that calculates the monthly Loan amortization amounts then adds
+     * Loop that calculates the monthly Fund amortization amounts then adds
      * them to the return string
      */
     for (var count = 0; count < terms; ++count) {

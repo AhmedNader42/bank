@@ -4,7 +4,7 @@ from users.models import User
 # Create your models here.
 
 
-class LoanOption(models.Model):
+class FundOption(models.Model):
     id = models.BigAutoField(primary_key=True)
     minimum_amount = models.DecimalField(max_digits=10, decimal_places=3)
     maximum_amount = models.DecimalField(max_digits=19, decimal_places=5)
@@ -12,7 +12,7 @@ class LoanOption(models.Model):
     interest_rate = models.PositiveIntegerField()
 
 
-class Loan(models.Model):
+class Fund(models.Model):
     PENDING = 1
     APPROVED = 2
     DENIED = 3
@@ -23,8 +23,8 @@ class Loan(models.Model):
         (DENIED, 'Denied')
     )
 
-    customer = models.ForeignKey(User, on_delete=models.CASCADE)
-    option = models.ForeignKey(LoanOption, on_delete=models.CASCADE)
+    funder = models.ForeignKey(User, on_delete=models.CASCADE)
+    option = models.ForeignKey(FundOption, on_delete=models.CASCADE)
 
     amount = models.DecimalField(max_digits=19, decimal_places=5)
     started = models.DateTimeField(default=now())

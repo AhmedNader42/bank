@@ -18,11 +18,13 @@ from django.urls import path
 from django.conf.urls import include
 from loans import urls as loans_urls
 from users import urls as users_urls
+from funds import urls as funds_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(users_urls)),
     path('', include(loans_urls)),
+    path('', include(funds_urls)),
     path('api/v1/dj-rest-auth/', include('dj_rest_auth.urls')),
     path('api/v1/dj-rest-auth/registration/',
          include('dj_rest_auth.registration.urls')),
