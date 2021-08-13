@@ -30,7 +30,8 @@ function refreshBankBalance() {
             balanceElement.innerHTML = "Balance: " + totalAmount;
         })
         .catch((e) => {
-            alert("Options Error!");
+            console.log(e)
+            console.log("bank balance Error!");
         });
 }
 function loadPendingRequests(path) {
@@ -66,7 +67,7 @@ function loadPendingRequests(path) {
         })
         .catch((e) => {
             console.log(e);
-            alert("Error loading loans pending!");
+            console.log("Error loading loans pending!");
         });
 }
 
@@ -118,7 +119,8 @@ function loadOptions(path) {
             loadPendingRequests(path);
         })
         .catch((e) => {
-            alert("Options Error!");
+            console.log(e);
+            console.log("Options Error!");
         });
 }
 
@@ -147,7 +149,7 @@ function changePendingStatus(id, path, decisionCode) {
         })
         .catch((e) => {
             console.log(e);
-            alert("Error making decision!");
+            console.log("Error making decision!");
         });
 }
 
@@ -173,7 +175,7 @@ function createOption(path) {
         })
         .catch((e) => {
             console.log(e);
-            alert("Error creating loan option!");
+            console.log("Error creating loan option!");
         });
 }
 
