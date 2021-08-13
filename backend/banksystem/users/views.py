@@ -20,6 +20,9 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserSerializer(queryset, many=True)
         return Response(serializer.data)
 
+    """
+        A User can only view himself or a superuser can view any user.
+    """
     def retrieve(self, request, pk=None):
         queryset = User.objects.all()
         user = get_object_or_404(queryset, username=pk)

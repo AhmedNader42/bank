@@ -6,13 +6,9 @@ from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 from dj_rest_auth.registration.serializers import RegisterSerializer
 
-
-# class UserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ('id', 'username', 'email', 'user_type')
-
-
+"""
+    Add a a user_type to the default user 
+"""
 class CustomRegisterSerializer(RegisterSerializer):
     user_type = serializers.IntegerField()
 
