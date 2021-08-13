@@ -7,7 +7,32 @@ let availableFundOptions = [];
 loadToken();
 loadOptions("loan");
 loadOptions("fund");
+refreshBankBalance();
 
+function refreshBankBalance() {
+    let tokenData = loadToken();
+    let token = tokenData["token"];
+
+    const options = {
+        method: "get",
+        url: `http://localhost:8000/bank-balance/`,
+        headers: {
+            Authorization: `Token ${token}`,
+        },
+    };
+
+    axios(options)
+        .then((res) => {
+            console.log("BALACE");
+            const totalAmount = res.data.total_amount;
+            console.log(totalAmount);
+            const balanceElement = document.getElementById("bank-balance");
+            balanceElement.innerHTML = "Balance: " + totalAmount;
+        })
+        .catch((e) => {
+            alert("Options Error!");
+        });
+}
 function loadPendingRequests(path) {
     const token = loadToken()["token"];
 
@@ -117,6 +142,7 @@ function changePendingStatus(id, path, decisionCode) {
             if (res.data.message) {
                 alert(res.data.message);
             }
+            refreshBankBalance()
             loadPendingRequests(path);
         })
         .catch((e) => {
@@ -242,8 +268,8 @@ maxSlider.oninput = function () {
     maxAmount.value = maxSlider.value;
 };
 
-document.getElementById("createLoanOptionRequestButton").setAttribute('onclick', `createOption("loan")`);
-document.getElementById("createFundOptionRequestButton").setAttribute('onclick', `createOption("fund")`);
+document.getElementById("createLoanOptionRequestButton").setAttribute("onclick", `createOption("loan")`);
+document.getElementById("createFundOptionRequestButton").setAttribute("onclick", `createOption("fund")`);
 
 let modal = document.getElementById("createOptionForm");
 let btn = document.getElementById("createOptionBtn");

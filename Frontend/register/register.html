@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>Bank System - Register</title>
+</head>
+
+<body>
+    <div class="centered-form">
+        <div class="container">
+            <label for="uname"><b>Username</b></label>
+            <input type="text" placeholder="Enter Username" name="uname" id="username" required>
+
+            <label for="email"><b>Email</b></label>
+            <input type="text" placeholder="Enter e-mail" name="email" id="email" required>
+
+            <label for="psw"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" name="psw" id="password" required>
+            <label for="psw"><b>Confirm Password</b></label>
+            <input type="password" placeholder="Confirm Password" name="cpsw" id="confirm-password" required>
+
+            <select name="user-type" id="user-type">
+                <option value="1">Banker</option>
+                <option value="2">Customer</option>
+                <option value="3">Funder</option>
+            </select>
+            <button onclick="register()">Register</button>
+        </div>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

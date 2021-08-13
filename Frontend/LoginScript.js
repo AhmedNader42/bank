@@ -63,3 +63,7 @@ function loadProfile(token, username) {
             window.location.href = "Login.html";
         });
 }
+
+function navigateToRegisterPage() {
+    window.location.href = "register/register.html";
+}
