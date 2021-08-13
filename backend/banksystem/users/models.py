@@ -13,4 +13,4 @@ class User(AbstractUser):
         (FUNDER, "FUNDER"),
     )
 
-    user_type = models.PositiveSmallIntegerField()
+    user_type = models.PositiveSmallIntegerField(default=2)

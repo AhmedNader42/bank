@@ -33,4 +33,4 @@ class Loan(models.Model):
         max_length=10, choices=STATUS_CHOICES)
 
     def __str__(self):
-        return self.amount
+        return str(self.amount)

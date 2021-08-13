@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 loadToken();
 loadFundOptions();
 
@@ -6,13 +6,13 @@ let availableFundOptions = [];
 let availableUserFunds = [];
 
 function loadUserFunds() {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = loadToken()["token"];
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = loadToken()['token'];
 
-    console.log(user["pk"])
+    console.log(user['pk']);
     const funderFunds = {
-        method: "get",
-        url: `http://localhost:8000/funder/${user["pk"]}/`,
+        method: 'get',
+        url: `http://localhost:8000/funder/${user['pk']}/`,
         headers: {
             Authorization: `Token ${token}`,
         },
@@ -23,21 +23,21 @@ function loadUserFunds() {
             console.log(res);
             availableUserFunds = res.data;
             for (let i = 0; i < availableUserFunds.length; i++) {
-                availableUserFunds[i]["option"] = getPlanWithID(availableUserFunds[i]["option"]);
+                availableUserFunds[i]['option'] = getPlanWithID(availableUserFunds[i]['option']);
             }
             listFunds(res.data);
         })
         .catch((e) => {
-            alert("Error loading funds!");
+            console.log('Error loading funds!');
         });
 }
 
 function loadFundOptions() {
     let tokenData = loadToken();
-    let token = tokenData["token"];
+    let token = tokenData['token'];
 
     const fundOptions = {
-        method: "get",
+        method: 'get',
         url: `http://localhost:8000/fund-options/`,
         headers: {
             Authorization: `Token ${token}`,
@@ -53,23 +53,23 @@ function loadFundOptions() {
 
             // Sort the list descending.
             fundOptions = fundOptions.sort(function (a, b) {
-                return b["duration"] - a["duration"];
+                return b['duration'] - a['duration'];
             });
 
             // Keep the fund options to use when changing plans.
             availableFundOptions = fundOptions;
 
             // Grab the select element.
-            var select = document.getElementById("fundOptions");
+            var select = document.getElementById('fundOptions');
 
             // Empty any previous data.
-            select.innerHTML = "";
+            select.innerHTML = '';
 
             // Add fund options as select options.
             fundOptions.forEach((element) => {
-                var option = document.createElement("option");
-                let duration = element["duration"];
-                option.value = element["id"];
+                var option = document.createElement('option');
+                let duration = element['duration'];
+                option.value = element['id'];
                 option.innerHTML = duration;
                 select.appendChild(option);
             });
@@ -81,20 +81,20 @@ function loadFundOptions() {
             loadUserFunds();
         })
         .catch((e) => {
-            alert("FundOptions Error!");
+            console.log('FundOptions Error!');
         });
 }
 
 function createFundRequest() {
-    let select = document.getElementById("fundOptions");
+    let select = document.getElementById('fundOptions');
     let selectedPlan = getPlanWithID(select.value);
-    let amount = document.getElementById("amount");
-    const user = JSON.parse(localStorage.getItem("user"));
-    let token = loadToken()["token"];
-    
-    console.log(user)
+    let amount = document.getElementById('amount');
+    const user = JSON.parse(localStorage.getItem('user'));
+    let token = loadToken()['token'];
+
+    console.log(user);
     const createFund = {
-        method: "post",
+        method: 'post',
         url: `http://localhost:8000/funds/`,
         headers: {
             Authorization: `Token ${token}`,
@@ -102,7 +102,7 @@ function createFundRequest() {
         data: {
             funder: user.pk,
             amount: Number(amount.value),
-            option: selectedPlan["id"],
+            option: selectedPlan['id'],
         },
     };
 
@@ -116,50 +116,50 @@ function createFundRequest() {
         })
         .catch((e) => {
             console.log(e);
-            alert("Creating fund Error!");
+            console.log('Creating fund Error!');
         });
 }
 
 function listFunds() {
-    let table = document.getElementById("fundsTable");
+    let table = document.getElementById('fundsTable');
     let thead = table.createTHead();
     let tbody = table.createTBody();
     const FUND_STATUS = {
         1: {
-            state: "PENDING",
-            color: "gray",
+            state: 'PENDING',
+            color: 'gray',
         },
         2: {
-            state: "APPROVED",
-            color: "green",
+            state: 'APPROVED',
+            color: 'green',
         },
         3: {
-            state: "DENIED",
-            color: "red",
+            state: 'DENIED',
+            color: 'red',
         },
     };
 
-    table.innerHTML = "";
+    table.innerHTML = '';
     let th = tbody.insertRow();
-    th.insertCell().innerHTML = "Amount";
-    th.insertCell().innerHTML = "Duration";
-    th.insertCell().innerHTML = "Started";
-    th.insertCell().innerHTML = "Status";
+    th.insertCell().innerHTML = 'Amount';
+    th.insertCell().innerHTML = 'Duration';
+    th.insertCell().innerHTML = 'Started';
+    th.insertCell().innerHTML = 'Status';
 
     for (let i = 0; i < availableUserFunds.length; i++) {
         const fund = availableUserFunds[i];
         let row = tbody.insertRow();
 
-        row.setAttribute("onclick", "showAmortizationTableForCell(" + i + ");");
+        row.setAttribute('onclick', 'showAmortizationTableForCell(' + i + ');');
 
-        row.insertCell().innerHTML = fund["amount"];
-        row.insertCell().innerHTML = fund["option"]["duration"] + " Months";
-        row.insertCell().innerHTML = fund["started"].split("T")[0];
+        row.insertCell().innerHTML = fund['amount'];
+        row.insertCell().innerHTML = fund['option']['duration'] + ' Months';
+        row.insertCell().innerHTML = fund['started'].split('T')[0];
 
         let statusCell = row.insertCell();
-        let fundStatus = FUND_STATUS[fund["status"]];
-        statusCell.innerHTML = fundStatus["state"];
-        statusCell.style.backgroundColor = fundStatus["color"];
+        let fundStatus = FUND_STATUS[fund['status']];
+        statusCell.innerHTML = fundStatus['state'];
+        statusCell.style.backgroundColor = fundStatus['color'];
     }
 
     table.appendChild(thead);
@@ -168,40 +168,40 @@ function listFunds() {
 
 function logout() {
     localStorage.clear();
-    window.location.href = "../Login.html";
+    window.location.href = '../Login.html';
 }
 
 function loadToken() {
-    let token = "";
-    let username = "";
+    let token = '';
+    let username = '';
     try {
-        token = localStorage.getItem("token").toString();
-        username = localStorage.getItem("username").toString();
+        token = localStorage.getItem('token').toString();
+        username = localStorage.getItem('username').toString();
         return {
             token: token,
             username: username,
         };
     } catch (error) {
-        window.location.href = "../Login.html";
+        window.location.href = '../Login.html';
     }
 }
 
 function selectedFundOption() {
-    let select = document.getElementById("fundOptions");
-    let interest = document.getElementById("interest");
-    let minAmount = document.getElementById("minAmount");
-    let maxAmount = document.getElementById("maxAmount");
-    let rangeSlider = document.getElementById("rangeSlider");
-    let amount = document.getElementById("amount");
+    let select = document.getElementById('fundOptions');
+    let interest = document.getElementById('interest');
+    let minAmount = document.getElementById('minAmount');
+    let maxAmount = document.getElementById('maxAmount');
+    let rangeSlider = document.getElementById('rangeSlider');
+    let amount = document.getElementById('amount');
 
     let selectedPlan = getPlanWithID(select.value);
     console.log(selectedPlan);
-    let minAmountOfMoney = selectedPlan["minimum_amount"].split(".")[0];
-    let maxAmountOfMoney = selectedPlan["maximum_amount"].split(".")[0];
+    let minAmountOfMoney = selectedPlan['minimum_amount'].split('.')[0];
+    let maxAmountOfMoney = selectedPlan['maximum_amount'].split('.')[0];
 
-    interest.innerText = "Interest : " + selectedPlan["interest_rate"] + "%";
-    minAmount.innerText = "Minimum Amount : " + minAmountOfMoney + "$";
-    maxAmount.innerText = "Maximum Amount : " + maxAmountOfMoney + "$";
+    interest.innerText = 'Interest : ' + selectedPlan['interest_rate'] + '%';
+    minAmount.innerText = 'Minimum Amount : ' + minAmountOfMoney + '$';
+    maxAmount.innerText = 'Maximum Amount : ' + maxAmountOfMoney + '$';
 
     amount.min = minAmountOfMoney;
     amount.max = maxAmountOfMoney;
@@ -215,33 +215,33 @@ function selectedFundOption() {
 function getPlanWithID(id) {
     for (let i = 0; i < availableFundOptions.length; i++) {
         let fundOption = availableFundOptions[i];
-        if (fundOption["id"] == id) {
+        if (fundOption['id'] == id) {
             return fundOption;
         }
     }
 }
-var btn = document.getElementById("createFundRequestBtn");
+var btn = document.getElementById('createFundRequestBtn');
 createFundRequestButton.onclick = function () {
     createFundRequest();
 };
 
-var modal = document.getElementById("createFundForm");
-var btn = document.getElementById("createFundBtn");
-var span = document.getElementsByClassName("close")[0];
+var modal = document.getElementById('createFundForm');
+var btn = document.getElementById('createFundBtn');
+var span = document.getElementsByClassName('close')[0];
 btn.onclick = function () {
-    modal.style.display = "block";
+    modal.style.display = 'block';
 };
 span.onclick = function () {
-    modal.style.display = "none";
+    modal.style.display = 'none';
 };
 window.onclick = function (event) {
     if (event.target == modal) {
-        modal.style.display = "none";
+        modal.style.display = 'none';
     }
 };
 
-var slider = document.getElementById("rangeSlider");
-var output = document.getElementById("amount");
+var slider = document.getElementById('rangeSlider');
+var output = document.getElementById('amount');
 
 slider.oninput = function () {
     output.value = this.value;
@@ -249,14 +249,14 @@ slider.oninput = function () {
 
 function showAmortizationTableForCell(rowIndex) {
     let fund = availableUserFunds[rowIndex];
-    let fundOptions = fund["option"];
-    let amortizationTable = document.getElementById("amortizationTable");
+    let fundOptions = fund['option'];
+    let amortizationTable = document.getElementById('amortizationTable');
     console.log(fund);
-    amortizationTable.innerHTML = "";
+    amortizationTable.innerHTML = '';
     amortizationTable.innerHTML = amort(
-        Number(fund["amount"]),
-        fundOptions["interest_rate"] / 100,
-        fundOptions["duration"]
+        Number(fund['amount']),
+        fundOptions['interest_rate'] / 100,
+        fundOptions['duration']
     );
 }
 function amort(balance, interestRate, terms) {
@@ -268,25 +268,26 @@ function amort(balance, interestRate, terms) {
 
     //begin building the return string for the display of the amort table
     var result =
-        "Fund amount: $" +
+        'Fund amount: $' +
         balance.toFixed(2) +
-        "<br />" +
-        "Interest rate: " +
+        '<br />' +
+        'Interest rate: ' +
         (interestRate * 100).toFixed(2) +
-        "%<br />" +
-        "Number of months: " +
+        '%<br />' +
+        'Number of months: ' +
         terms +
-        "<br />" +
-        "Monthly payment: $" +
+        '<br />' +
+        'Monthly payment: $' +
         payment.toFixed(2) +
-        "<br />" +
-        "Total paid: $" +
+        '<br />' +
+        'Total paid: $' +
         (payment * terms).toFixed(2) +
-        "<br /><br />";
+        '<br /><br />';
 
     //add header row for table to return string
     result +=
-        "<table border='1' width='100%'><tr><th>Month #</th><th>Balance</th>" + "<th>Interest</th><th>Principal</th>";
+        "<table border='1' width='100%'><tr><th>Month #</th><th>Balance</th>" +
+        '<th>Interest</th><th>Principal</th>';
 
     /**
      * Loop that calculates the monthly Fund amortization amounts then adds
@@ -300,36 +301,32 @@ function amort(balance, interestRate, terms) {
         var monthlyPrincipal = 0;
 
         //start a new table row on each loop iteration
-        result += "<tr align=center>";
+        result += '<tr align=center>';
 
         //display the month number in col 1 using the loop count variable
-        result += "<td>" + (count + 1) + "</td>";
+        result += '<td>' + (count + 1) + '</td>';
 
         //code for displaying in loop balance
-        result += "<td> $" + balance.toFixed(2) + "</td>";
+        result += '<td> $' + balance.toFixed(2) + '</td>';
 
         //calc the in-loop interest amount and display
         interest = balance * monthlyRate;
-        result += "<td> $" + interest.toFixed(2) + "</td>";
+        result += '<td> $' + interest.toFixed(2) + '</td>';
 
         //calc the in-loop monthly principal and display
         monthlyPrincipal = payment - interest;
-        result += "<td> $" + monthlyPrincipal.toFixed(2) + "</td>";
+        result += '<td> $' + monthlyPrincipal.toFixed(2) + '</td>';
 
         //end the table row on each iteration of the loop
-        result += "</tr>";
+        result += '</tr>';
 
         //update the balance for each loop iteration
         balance = balance - monthlyPrincipal;
     }
 
     //Final piece added to return string before returning it - closes the table
-    result += "</table>";
+    result += '</table>';
 
     //returns the concatenated string to the page
     return result;
 }
-
-let amortTable = document.getElementById("amortizationTable");
-let amortHTML = amort(10000, 10, 12);
-amortTable.innerHTML += amortHTML;

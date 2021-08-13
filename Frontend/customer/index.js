@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 loadToken();
 loadLoanOptions();
 
@@ -6,13 +6,13 @@ let availableLoanOptions = [];
 let availableUserLoans = [];
 
 function loadUserLoans() {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = loadToken()["token"];
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = loadToken()['token'];
 
-    console.log(user["pk"])
+    console.log(user['pk']);
     const customerLoans = {
-        method: "get",
-        url: `http://localhost:8000/customer/${user["pk"]}/`,
+        method: 'get',
+        url: `http://localhost:8000/customer/${user['pk']}/`,
         headers: {
             Authorization: `Token ${token}`,
         },
@@ -23,21 +23,22 @@ function loadUserLoans() {
             console.log(res);
             availableUserLoans = res.data;
             for (let i = 0; i < availableUserLoans.length; i++) {
-                availableUserLoans[i]["option"] = getPlanWithID(availableUserLoans[i]["option"]);
+                availableUserLoans[i]['option'] = getPlanWithID(availableUserLoans[i]['option']);
             }
             listLoans(res.data);
         })
         .catch((e) => {
-            alert("Error loading loans!");
+            console.log('Error loading loans!');
+            console.log(e);
         });
 }
 
 function loadLoanOptions() {
     let tokenData = loadToken();
-    let token = tokenData["token"];
+    let token = tokenData['token'];
 
     const loanOptions = {
-        method: "get",
+        method: 'get',
         url: `http://localhost:8000/loan-options/`,
         headers: {
             Authorization: `Token ${token}`,
@@ -53,23 +54,23 @@ function loadLoanOptions() {
 
             // Sort the list descending.
             loanOptions = loanOptions.sort(function (a, b) {
-                return b["duration"] - a["duration"];
+                return b['duration'] - a['duration'];
             });
 
             // Keep the loan options to use when changing plans.
             availableLoanOptions = loanOptions;
 
             // Grab the select element.
-            var select = document.getElementById("loanOptions");
+            var select = document.getElementById('loanOptions');
 
             // Empty any previous data.
-            select.innerHTML = "";
+            select.innerHTML = '';
 
             // Add loan options as select options.
             loanOptions.forEach((element) => {
-                var option = document.createElement("option");
-                let duration = element["duration"];
-                option.value = element["id"];
+                var option = document.createElement('option');
+                let duration = element['duration'];
+                option.value = element['id'];
                 option.innerHTML = duration;
                 select.appendChild(option);
             });
@@ -81,19 +82,20 @@ function loadLoanOptions() {
             loadUserLoans();
         })
         .catch((e) => {
-            alert("LoanOptions Error!");
+            console.log('Error getting loan options');
+            console.log(e);
         });
 }
 
 function createLoanRequest() {
-    let select = document.getElementById("loanOptions");
+    let select = document.getElementById('loanOptions');
     let selectedPlan = getPlanWithID(select.value);
-    let amount = document.getElementById("amount");
-    const user = JSON.parse(localStorage.getItem("user"));
-    let token = loadToken()["token"];
+    let amount = document.getElementById('amount');
+    const user = JSON.parse(localStorage.getItem('user'));
+    let token = loadToken()['token'];
 
     const createLoan = {
-        method: "post",
+        method: 'post',
         url: `http://localhost:8000/loans/`,
         headers: {
             Authorization: `Token ${token}`,
@@ -101,7 +103,7 @@ function createLoanRequest() {
         data: {
             customer: user.pk,
             amount: Number(amount.value),
-            option: selectedPlan["id"],
+            option: selectedPlan['id'],
         },
     };
 
@@ -114,51 +116,51 @@ function createLoanRequest() {
             loadUserLoans();
         })
         .catch((e) => {
+            console.log('Creating loan Error!');
             console.log(e);
-            alert("Creating loan Error!");
         });
 }
 
 function listLoans() {
-    let table = document.getElementById("loansTable");
+    let table = document.getElementById('loansTable');
     let thead = table.createTHead();
     let tbody = table.createTBody();
     const LOAN_STATUS = {
         1: {
-            state: "PENDING",
-            color: "gray",
+            state: 'PENDING',
+            color: 'gray',
         },
         2: {
-            state: "APPROVED",
-            color: "green",
+            state: 'APPROVED',
+            color: 'green',
         },
         3: {
-            state: "DENIED",
-            color: "red",
+            state: 'DENIED',
+            color: 'red',
         },
     };
 
-    table.innerHTML = "";
+    table.innerHTML = '';
     let th = tbody.insertRow();
-    th.insertCell().innerHTML = "Amount";
-    th.insertCell().innerHTML = "Duration";
-    th.insertCell().innerHTML = "Started";
-    th.insertCell().innerHTML = "Status";
+    th.insertCell().innerHTML = 'Amount';
+    th.insertCell().innerHTML = 'Duration';
+    th.insertCell().innerHTML = 'Started';
+    th.insertCell().innerHTML = 'Status';
 
     for (let i = 0; i < availableUserLoans.length; i++) {
         const loan = availableUserLoans[i];
         let row = tbody.insertRow();
 
-        row.setAttribute("onclick", "showAmortizationTableForCell(" + i + ");");
+        row.setAttribute('onclick', 'showAmortizationTableForCell(' + i + ');');
 
-        row.insertCell().innerHTML = loan["amount"];
-        row.insertCell().innerHTML = loan["option"]["duration"] + " Months";
-        row.insertCell().innerHTML = loan["started"].split("T")[0];
+        row.insertCell().innerHTML = loan['amount'];
+        row.insertCell().innerHTML = loan['option']['duration'] + ' Months';
+        row.insertCell().innerHTML = loan['started'].split('T')[0];
 
         let statusCell = row.insertCell();
-        let loanStatus = LOAN_STATUS[loan["status"]];
-        statusCell.innerHTML = loanStatus["state"];
-        statusCell.style.backgroundColor = loanStatus["color"];
+        let loanStatus = LOAN_STATUS[loan['status']];
+        statusCell.innerHTML = loanStatus['state'];
+        statusCell.style.backgroundColor = loanStatus['color'];
     }
 
     table.appendChild(thead);
@@ -167,40 +169,40 @@ function listLoans() {
 
 function logout() {
     localStorage.clear();
-    window.location.href = "../Login.html";
+    window.location.href = '../Login.html';
 }
 
 function loadToken() {
-    let token = "";
-    let username = "";
+    let token = '';
+    let username = '';
     try {
-        token = localStorage.getItem("token").toString();
-        username = localStorage.getItem("username").toString();
+        token = localStorage.getItem('token').toString();
+        username = localStorage.getItem('username').toString();
         return {
             token: token,
             username: username,
         };
     } catch (error) {
-        window.location.href = "../Login.html";
+        window.location.href = '../Login.html';
     }
 }
 
 function selectedLoanOption() {
-    let select = document.getElementById("loanOptions");
-    let interest = document.getElementById("interest");
-    let minAmount = document.getElementById("minAmount");
-    let maxAmount = document.getElementById("maxAmount");
-    let rangeSlider = document.getElementById("rangeSlider");
-    let amount = document.getElementById("amount");
+    let select = document.getElementById('loanOptions');
+    let interest = document.getElementById('interest');
+    let minAmount = document.getElementById('minAmount');
+    let maxAmount = document.getElementById('maxAmount');
+    let rangeSlider = document.getElementById('rangeSlider');
+    let amount = document.getElementById('amount');
 
     let selectedPlan = getPlanWithID(select.value);
     console.log(selectedPlan);
-    let minAmountOfMoney = selectedPlan["minimum_amount"].split(".")[0];
-    let maxAmountOfMoney = selectedPlan["maximum_amount"].split(".")[0];
+    let minAmountOfMoney = selectedPlan['minimum_amount'].split('.')[0];
+    let maxAmountOfMoney = selectedPlan['maximum_amount'].split('.')[0];
 
-    interest.innerText = "Interest : " + selectedPlan["interest_rate"] + "%";
-    minAmount.innerText = "Minimum Amount : " + minAmountOfMoney + "$";
-    maxAmount.innerText = "Maximum Amount : " + maxAmountOfMoney + "$";
+    interest.innerText = 'Interest : ' + selectedPlan['interest_rate'] + '%';
+    minAmount.innerText = 'Minimum Amount : ' + minAmountOfMoney + '$';
+    maxAmount.innerText = 'Maximum Amount : ' + maxAmountOfMoney + '$';
 
     amount.min = minAmountOfMoney;
     amount.max = maxAmountOfMoney;
@@ -214,33 +216,33 @@ function selectedLoanOption() {
 function getPlanWithID(id) {
     for (let i = 0; i < availableLoanOptions.length; i++) {
         let loanOption = availableLoanOptions[i];
-        if (loanOption["id"] == id) {
+        if (loanOption['id'] == id) {
             return loanOption;
         }
     }
 }
-var btn = document.getElementById("createLoanRequestBtn");
+var btn = document.getElementById('createLoanRequestBtn');
 createLoanRequestButton.onclick = function () {
     createLoanRequest();
 };
 
-var modal = document.getElementById("createLoanForm");
-var btn = document.getElementById("createLoanBtn");
-var span = document.getElementsByClassName("close")[0];
+var modal = document.getElementById('createLoanForm');
+var btn = document.getElementById('createLoanBtn');
+var span = document.getElementsByClassName('close')[0];
 btn.onclick = function () {
-    modal.style.display = "block";
+    modal.style.display = 'block';
 };
 span.onclick = function () {
-    modal.style.display = "none";
+    modal.style.display = 'none';
 };
 window.onclick = function (event) {
     if (event.target == modal) {
-        modal.style.display = "none";
+        modal.style.display = 'none';
     }
 };
 
-var slider = document.getElementById("rangeSlider");
-var output = document.getElementById("amount");
+var slider = document.getElementById('rangeSlider');
+var output = document.getElementById('amount');
 
 slider.oninput = function () {
     output.value = this.value;
@@ -248,14 +250,14 @@ slider.oninput = function () {
 
 function showAmortizationTableForCell(rowIndex) {
     let loan = availableUserLoans[rowIndex];
-    let loanOptions = loan["option"];
-    let amortizationTable = document.getElementById("amortizationTable");
+    let loanOptions = loan['option'];
+    let amortizationTable = document.getElementById('amortizationTable');
     console.log(loan);
-    amortizationTable.innerHTML = "";
+    amortizationTable.innerHTML = '';
     amortizationTable.innerHTML = amort(
-        Number(loan["amount"]),
-        loanOptions["interest_rate"] / 100,
-        loanOptions["duration"]
+        Number(loan['amount']),
+        loanOptions['interest_rate'] / 100,
+        loanOptions['duration']
     );
 }
 function amort(balance, interestRate, terms) {
@@ -267,25 +269,26 @@ function amort(balance, interestRate, terms) {
 
     //begin building the return string for the display of the amort table
     var result =
-        "Loan amount: $" +
+        'Loan amount: $' +
         balance.toFixed(2) +
-        "<br />" +
-        "Interest rate: " +
+        '<br />' +
+        'Interest rate: ' +
         (interestRate * 100).toFixed(2) +
-        "%<br />" +
-        "Number of months: " +
+        '%<br />' +
+        'Number of months: ' +
         terms +
-        "<br />" +
-        "Monthly payment: $" +
+        '<br />' +
+        'Monthly payment: $' +
         payment.toFixed(2) +
-        "<br />" +
-        "Total paid: $" +
+        '<br />' +
+        'Total paid: $' +
         (payment * terms).toFixed(2) +
-        "<br /><br />";
+        '<br /><br />';
 
     //add header row for table to return string
     result +=
-        "<table border='1' width='100%'><tr><th>Month #</th><th>Balance</th>" + "<th>Interest</th><th>Principal</th>";
+        "<table border='1' width='100%'><tr><th>Month #</th><th>Balance</th>" +
+        '<th>Interest</th><th>Principal</th>';
 
     /**
      * Loop that calculates the monthly Loan amortization amounts then adds
@@ -299,36 +302,33 @@ function amort(balance, interestRate, terms) {
         var monthlyPrincipal = 0;
 
         //start a new table row on each loop iteration
-        result += "<tr align=center>";
+        result += '<tr align=center>';
 
         //display the month number in col 1 using the loop count variable
-        result += "<td>" + (count + 1) + "</td>";
+        result += '<td>' + (count + 1) + '</td>';
 
         //code for displaying in loop balance
-        result += "<td> $" + balance.toFixed(2) + "</td>";
+        result += '<td> $' + balance.toFixed(2) + '</td>';
 
         //calc the in-loop interest amount and display
         interest = balance * monthlyRate;
-        result += "<td> $" + interest.toFixed(2) + "</td>";
+        result += '<td> $' + interest.toFixed(2) + '</td>';
 
         //calc the in-loop monthly principal and display
         monthlyPrincipal = payment - interest;
-        result += "<td> $" + monthlyPrincipal.toFixed(2) + "</td>";
+        result += '<td> $' + monthlyPrincipal.toFixed(2) + '</td>';
 
         //end the table row on each iteration of the loop
-        result += "</tr>";
+        result += '</tr>';
 
         //update the balance for each loop iteration
         balance = balance - monthlyPrincipal;
     }
 
     //Final piece added to return string before returning it - closes the table
-    result += "</table>";
+    result += '</table>';
 
     //returns the concatenated string to the page
     return result;
 }
 
-let amortTable = document.getElementById("amortizationTable");
-let amortHTML = amort(10000, 10, 12);
-amortTable.innerHTML += amortHTML;
