@@ -9,8 +9,10 @@ from rest_framework.exceptions import PermissionDenied
 from users.models import User
 from loans.helpers import toJSON
 from bank.models import Bank
-from bank.views import create_bank
+from bank.views import get_or_create_bank
 from django.shortcuts import get_object_or_404
+from decimal import *
+
 # Create your views here.
 
 
@@ -33,7 +35,7 @@ class FundViewSet(viewsets.ModelViewSet):
             raise PermissionDenied()
 
         funder = User.objects.get(pk=body['funder'])
-        amount = body['amount']
+        amount = Decimal(body['amount'])
         option = FundOption.objects.get(pk=body['option'])
 
         if amount > option.maximum_amount or amount < option.minimum_amount:
@@ -54,18 +56,11 @@ class FundViewSet(viewsets.ModelViewSet):
 
         fund = get_object_or_404(Fund, pk=pk)
 
-        bankList = Bank.objects.all().filter(pk=0)
-
-        bank = None
-        if len(bankList) == 0:
-            create_bank()
-            bankList = Bank.objects.all().filter(pk=0)
-            bank = bankList[0]
-        else:
-            bank = bankList[0]
-
+        bank = get_or_create_bank()
+        
         fund.status = status
         fund.save()
+
         bank.total_amount += fund.amount
         bank.save()
         serializer = FundSerializer(fund)

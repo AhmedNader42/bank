@@ -9,7 +9,7 @@ from rest_framework.exceptions import PermissionDenied
 from users.models import User
 from .helpers import toJSON
 from bank.models import Bank
-from bank.views import create_bank
+from bank.views import get_or_create_bank
 from django.shortcuts import get_object_or_404
 # Create your views here.
 
@@ -53,17 +53,10 @@ class LoanViewSet(viewsets.ModelViewSet):
 
         loan = get_object_or_404(Loan, pk=pk)
 
-        bankList = Bank.objects.all().filter(pk=0)
-        bank = None
-        if len(bankList) == 0:
-            create_bank()
-            bankList = Bank.objects.all().filter(pk=0)
-            bank = bankList[0]
-        else:
-            bank = bankList[0]
+        bank = get_or_create_bank()
 
         if status != Loan.APPROVED:
-            loan.status = status 
+            loan.status = status
             loan.save()
             serializer = LoanSerializer(loan)
             return Response(serializer.data)
