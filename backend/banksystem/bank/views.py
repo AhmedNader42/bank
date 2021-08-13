@@ -8,7 +8,10 @@ from users.models import User
 
 # Create your views here.
 
-
+"""
+    This function checks for the bank object existance and if it doesn't then creates it.
+    The Bank balance needs to be a Singelton to all calculations of loans and funds consistent.
+"""
 def get_or_create_bank():
     if Bank.objects.filter(pk=0).exists():
         print("Exists")
@@ -22,7 +25,9 @@ def get_or_create_bank():
         b.save()
         return b
 
-
+"""
+    Make sure only a Banker can view the total_amount of balance in the Bank.
+"""
 @api_view(['GET'])
 def get_total_amount(request):
     # Make sure the user is a Banker to see the bank balance. Otherwise deny permission.

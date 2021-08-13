@@ -25,19 +25,26 @@ class LoanViewSet(viewsets.ModelViewSet):
     serializer_class = LoanSerializer
 
     def create(self, request):
+        # Parse the body into valid JSON with this helper function.
         body = toJSON(request.body)
-        print(body)
 
+        """
+            - Make sure that a customer can only add loans for himself.
+            - Make sure that the request is done by a customer.
+        """
         if request.user.id != body['customer'] or request.user.user_type != User.CUSTOMER:
             raise PermissionDenied()
 
+        # Gather the data from the request body.
         customer = User.objects.get(pk=body['customer'])
         amount = body['amount']
         option = LoanOption.objects.get(pk=body['option'])
 
+        # Make sure the loan amount fits in the range of the loan option
         if amount > option.maximum_amount or amount < option.minimum_amount:
             return Response({"message": "Incorrect amount for your plan"})
 
+        # Save the loan with the data from the body.
         l = Loan(customer=customer, option=option,
                  amount=amount, status=Loan.PENDING)
         l.save()
@@ -46,25 +53,40 @@ class LoanViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def partial_update(self, request, pk=None):
+        """
+            Make sure that only a Banker can change the status of any pending item.
+        """
         if request.user.user_type != User.BANKER:
             raise PermissionDenied()
+
         body = toJSON(request.body)
+
+        # Get the status from the request body.
         status = body["status"]
 
+        # Fetch the loan object.
         loan = get_object_or_404(Loan, pk=pk)
 
-        bank = get_or_create_bank()
-
+        """
+            If the item is Denied or Pending then update right away without having to check with the system.
+        """
         if status != Loan.APPROVED:
             loan.status = status
             loan.save()
             serializer = LoanSerializer(loan)
             return Response(serializer.data)
 
+        # Get the bank object or create it.
+        bank = get_or_create_bank()
+
+        """
+            Make sure the bank can loan the customer the amount needed from the bank balance.
+        """
         if loan.amount < bank.total_amount:
             print("Can take loan")
             loan.status = status
             loan.save()
+
             bank.total_amount -= loan.amount
             bank.save()
             serializer = LoanSerializer(loan)
