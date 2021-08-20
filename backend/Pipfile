@@ -11,6 +11,7 @@ django-allauth = "~=0.42.0"
 django = "~=3.1.0"
 djangorestframework = "~=3.11.0"
 django-cors-headers = "*"
+stripe = "*"
 
 [requires]
 python_version = "3.7"

@@ -26,7 +26,7 @@ class FundViewSet(viewsets.ModelViewSet):
     queryset = Fund.objects.all()
     serializer_class = FundSerializer
 
-    def create(self, request): 3
+    def create(self, request):
         # Parse the body into valid JSON.
         body = toJSON(request.body)
 
@@ -34,7 +34,7 @@ class FundViewSet(viewsets.ModelViewSet):
             - Make sure that a Funder can only add Funds from himself.
             - Make sure that the request is done by a Funder.
         """
-       if request.user.id != body['funder'] or request.user.user_type != User.FUNDER:
+        if request.user.id != body['funder'] or request.user.user_type != User.FUNDER:
             raise PermissionDenied()
 
         # Gather the data from the request body.

@@ -28,7 +28,7 @@ class Loan(models.Model):
 
     amount = models.DecimalField(max_digits=19, decimal_places=5)
     started = models.DateTimeField(default=now())
-
+    payment_url = models.CharField(max_length=300, default="")
     status = models.CharField(
         max_length=10, choices=STATUS_CHOICES)
 

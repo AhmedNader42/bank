@@ -11,6 +11,13 @@ from .helpers import toJSON
 from bank.models import Bank
 from bank.views import get_or_create_bank
 from django.shortcuts import get_object_or_404
+from decimal import Decimal
+import math
+
+import stripe
+
+stripe.api_key = "sk_test_51JQJmIDP01ev1pnVi4luE9KefOuioXzgtLUrckNi5qJJmeiBNtXstuXah3BEsaG80eqWz0ZZA5oel4kjEHeveN9D00yUcx8ERF"
+
 # Create your views here.
 
 
@@ -65,7 +72,11 @@ class LoanViewSet(viewsets.ModelViewSet):
         status = body["status"]
 
         # Fetch the loan object.
-        loan = get_object_or_404(Loan, pk=pk)
+        # loan = get_object_or_404(Loan, pk=pk).prefetch_related('LoanOption')
+        loan = Loan.objects.filter(pk=pk).prefetch_related('option')[0]
+
+        if loan == None:
+            return Response({"Message": "Loan ID incorrect"})
 
         """
             If the item is Denied or Pending then update right away without having to check with the system.
@@ -75,6 +86,28 @@ class LoanViewSet(viewsets.ModelViewSet):
             loan.save()
             serializer = LoanSerializer(loan)
             return Response(serializer.data)
+
+        product = stripe.Product.create(
+            name="loan-" + str(pk) + "-" + str(loan.customer)
+        )
+
+        interest_rate = loan.option.interest_rate / 100
+        monthly_rate = Decimal(interest_rate / 12)
+        monthly_payment_amount = loan.amount * \
+            (monthly_rate / (1 - (1+monthly_rate)**(-loan.option.duration)))
+        print(math.ceil(float("{:.2f}".format(monthly_payment_amount))))
+        unit_amount = math.ceil(float("{:.2f}".format(monthly_payment_amount)))
+        price = stripe.Price.create(
+            unit_amount=unit_amount * 100,
+            currency="usd",
+            recurring={"interval": "month"},
+            product=product.id
+        )
+
+        print("Printing product return")
+        print(product)
+        print(price)
+        loan.payment_url = price.id
 
         # Get the bank object or create it.
         bank = get_or_create_bank()
