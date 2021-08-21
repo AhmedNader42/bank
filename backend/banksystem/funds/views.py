@@ -11,7 +11,7 @@ from loans.helpers import toJSON
 from bank.models import Bank
 from bank.views import get_or_create_bank
 from django.shortcuts import get_object_or_404
-from rest_framework import status
+from rest_framework import status as HTTPStatus
 
 from decimal import *
 import math
@@ -77,7 +77,7 @@ class FundViewSet(viewsets.ModelViewSet):
         """
         fundQS = Fund.objects.filter(pk=pk).prefetch_related('option')
         if len(fundQS) == 0:
-            return Response({"Message": "Fund ID incorrect"})
+            return Response({"Message": "Fund ID incorrect"}, status=HTTPStatus.HTTP_404_NOT_FOUND)
         fund = fundQS[0]
 
         if status != Fund.APPROVED:
@@ -97,17 +97,28 @@ class FundViewSet(viewsets.ModelViewSet):
             currency="usd",
             product=product.id
         )
-
         print(product)
         print(price)
-        fund.payment_url = price.id
-        fund.status = status
-        fund.save()
 
         # # Get the bank object or create it.
         bank = get_or_create_bank()
 
         # Add the amount into the bank balance.
+        interest_rate = fund.option.interest_rate / 100
+        monthly_rate = Decimal(interest_rate / 12)
+        monthly_payment_amount = fund.amount * \
+            (monthly_rate / (1 - (1+monthly_rate)**(-fund.option.duration)))
+
+        fund_total_outflow = (Decimal(monthly_payment_amount) *
+                              int(fund.option.duration)) - Decimal(fund.amount)
+        if bank.out_flow + fund_total_outflow >= bank.in_flow:
+            return Response({"message": "This fund is not viable since it costs more than the total in flow"}, status=HTTPStatus.HTTP_403_FORBIDDEN)
+
+        fund.payment_url = price.id
+        fund.status = status
+        fund.save()
+
+        bank.out_flow += fund_total_outflow
         bank.total_amount += fund.amount
         bank.save()
         serializer = FundSerializer(fund)
@@ -117,6 +128,8 @@ class FundViewSet(viewsets.ModelViewSet):
 """
     Get all funds for a specific funder.
 """
+
+
 @api_view(['GET'])
 def view_funder_funds(request, id):
 
@@ -131,6 +144,8 @@ def view_funder_funds(request, id):
 """
     Verify Fund Payment
 """
+
+
 @api_view(['POST'])
 def verify_fund_payment(request, fund_id):
     print(fund_id)
@@ -143,7 +158,7 @@ def verify_fund_payment(request, fund_id):
 
     for t in payments:
         print(("fund" + "-" + str(fund_id) + "-" +
-               str(request.user))in t["description"])
+               str(request.user)) in t["description"])
         if ("fund" + "-" + str(fund_id) + "-" + str(request.user)) in t["description"]:
             print(t["amount_received"])
             print(t["charges"]["data"][0]["receipt_url"])
@@ -152,7 +167,7 @@ def verify_fund_payment(request, fund_id):
             fund = get_object_or_404(queryset, id=fund_id)
 
             if fund.payment_verified:
-                return Response({"message": "Payment Already Verified"}, status=status.HTTP_409_CONFLICT)
+                return Response({"message": "Payment Already Verified"}, status=HTTPStatus.HTTP_409_CONFLICT)
 
             if t["amount_received"] + 1 >= fund.amount:
                 fund.payment_verified = True
@@ -162,12 +177,14 @@ def verify_fund_payment(request, fund_id):
                 serializer = FundSerializer(fund)
                 return Response(serializer.data)
 
-    return Response({"message": "Couldn't find payment for fund specified"}, status=status.HTTP_404_NOT_FOUND)
+    return Response({"message": "Couldn't find payment for fund specified"}, status=HTTPStatus.HTTP_404_NOT_FOUND)
 
 
 """
     List all the pending funds for the banker.
 """
+
+
 @api_view(['GET'])
 def view_pending_funds(request):
     # Check user is a banker.

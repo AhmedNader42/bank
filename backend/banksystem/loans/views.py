@@ -14,6 +14,8 @@ from django.shortcuts import get_object_or_404
 from decimal import Decimal
 import math
 import stripe
+from rest_framework import status as HTTPStatus
+
 
 stripe.api_key = "sk_test_51JQJmIDP01ev1pnVi4luE9KefOuioXzgtLUrckNi5qJJmeiBNtXstuXah3BEsaG80eqWz0ZZA5oel4kjEHeveN9D00yUcx8ERF"
 
@@ -74,7 +76,7 @@ class LoanViewSet(viewsets.ModelViewSet):
         loanQS = Loan.objects.filter(pk=pk).prefetch_related('option')
 
         if len(loanQS) == 0:
-            return Response({"Message": "Loan ID incorrect"})
+            return Response({"Message": "Loan ID incorrect"}, status=HTTPStatus.HTTP_404_NOT_FOUND)
 
         loan = loanQS[0]
         """
@@ -119,13 +121,16 @@ class LoanViewSet(viewsets.ModelViewSet):
             loan.status = status
             loan.save()
 
+            loan_total_inflow = (Decimal(monthly_payment_amount)
+                                 * int(loan.option.duration)) - Decimal(loan.amount)
+            bank.in_flow += loan_total_inflow
             bank.total_amount -= loan.amount
             bank.save()
             serializer = LoanSerializer(loan)
             return Response(serializer.data)
         else:
             print("Can't take loan")
-            return Response({"message": "Not enough funds"})
+            return Response({"message": "Not enough funds"}, status=HTTPStatus.HTTP_403_FORBIDDEN)
 
 
 @api_view(['GET'])
