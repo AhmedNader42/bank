@@ -195,3 +195,4 @@ def view_pending_funds(request):
     queryset = Fund.objects.all().filter(status=Fund.PENDING)
     serializer = FundSerializer(queryset, many=True)
     return Response(serializer.data)
+# git remote add origin https://[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]@github.com/ahmednader42/bank-frontend.git
