@@ -1,6 +1,7 @@
 from django.db import models
-from django.utils.timezone import now
 from users.models import User
+from django.utils import timezone
+
 # Create your models here.
 
 
@@ -27,8 +28,8 @@ class Loan(models.Model):
     option = models.ForeignKey(LoanOption, on_delete=models.CASCADE)
 
     amount = models.DecimalField(max_digits=19, decimal_places=5)
-    started = models.DateTimeField(default=now())
-    payment_url = models.CharField(max_length=300, default="")
+    started = models.DateTimeField(default=timezone.now)
+    payment_url = models.CharField(max_length=500, default="")
     status = models.CharField(
         max_length=10, choices=STATUS_CHOICES)
 

@@ -1,6 +1,7 @@
 from django.db import models
-from django.utils.timezone import now
 from users.models import User
+from django.utils import timezone
+
 # Create your models here.
 
 
@@ -25,12 +26,15 @@ class Fund(models.Model):
 
     funder = models.ForeignKey(User, on_delete=models.CASCADE)
     option = models.ForeignKey(FundOption, on_delete=models.CASCADE)
+    payment_url = models.CharField(max_length=500, default="")
 
     amount = models.DecimalField(max_digits=19, decimal_places=5)
-    started = models.DateTimeField(default=now())
+    started = models.DateTimeField(default=timezone.now)
 
     status = models.CharField(
         max_length=10, choices=STATUS_CHOICES)
+    payment_verified = models.BooleanField(default=False)
+    payment_receipt_url = models.CharField(max_length=500, default="")
 
     def __str__(self):
         return str(self.amount)
