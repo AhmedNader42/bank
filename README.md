@@ -1,3 +1,5 @@
+### Demo
+Check out this video for a demo of the app working (https://www.youtube.com/watch?v=hQmGF3IvkT0)
 # How to run
 
 ## Prerequisite
